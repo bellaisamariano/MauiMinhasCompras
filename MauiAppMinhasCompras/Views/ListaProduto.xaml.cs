@@ -74,6 +74,22 @@ public partial class ListaProduto : ContentPage
         DisplayAlert("Total dos Produtos", msg, "OK");
     }
 
+    private void BtnSomar_Clicked(object sender, EventArgs e)
+    {
+
+        int soma;
+
+        var totaisPorCategoria = lista
+    .GroupBy(p => string.IsNullOrWhiteSpace(p.Categoria) ? "Sem categoria" : p.Categoria)
+    .Select(g => (Categoria: g.Key, Total: g.Sum(p => p.Preco * p.Quantidade)))
+    .ToList();
+
+        string mensagem = string.Join("\n", totaisPorCategoria
+    .Select(t => $"{t.Categoria}: R$ {t.Total:F2}"));
+
+        DisplayAlert("Total dos Produtos por Categoria", mensagem, "OK");
+    }
+
     private async void MenuItem_Clicked(object sender, EventArgs e)
     {
         try
@@ -84,7 +100,7 @@ public partial class ListaProduto : ContentPage
             bool confirm = await DisplayAlert(
                 "Tem Certeza?", $"Remover {p.Descricao}?", "Sim", "Não");
 
-            if(confirm)
+            if (confirm)
             {
                 await App.Db.Delete(p.Id);
                 lista.Remove(p);
@@ -96,7 +112,7 @@ public partial class ListaProduto : ContentPage
         }
     }
 
-    private void lst_produtos_ItemSelected(object sender, 
+    private void lst_produtos_ItemSelected(object sender,
         SelectedItemChangedEventArgs e)
     {
         try
@@ -128,7 +144,8 @@ public partial class ListaProduto : ContentPage
         {
             await DisplayAlert("Ops", ex.Message, "OK");
 
-        } finally
+        }
+        finally
         {
             lst_produtos.IsRefreshing = false;
         }
